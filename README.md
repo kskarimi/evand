@@ -55,6 +55,7 @@ Services:
 - Logging:
   - Structured console format with `traceId` and `spanId`
   - Root log level is `ERROR`
+  - Startup summary logs include startup duration, runtime, profiles, and key endpoints/configs
 - Circuit breaker name for notifications: `notificationService`
 - Customer API rate limit:
   - Fixed window, per client IP
