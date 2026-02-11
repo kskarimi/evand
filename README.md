@@ -1,6 +1,6 @@
 # Event Management (Spring Modulith)
 
-Modular monolith for event management with async change shipping, observability, resilience, and persistence.
+Modular monolith for event management with async data shipping, observability, resilience, and persistence.
 
 ## Stack
 - Java 25
@@ -19,6 +19,11 @@ Modular monolith for event management with async change shipping, observability,
 - Architecture: `docs/ARCHITECTURE.md`
 - API + curl: `docs/API.md`
 - Postman collection: `docs/postman/event-management.postman_collection.json`
+
+## Project Coordinates
+- `groupId`: `com.kkarimi`
+- `artifactId`: `event-management`
+- `version`: `0.0.1-SNAPSHOT`
 
 ## Run Locally
 ```bash
@@ -52,6 +57,17 @@ Services:
   - Applied on `/api/attendees/**` and `/api/registrations/**`
   - Exceed response: HTTP `429`
 
+## CI/Release
+Workflow:
+- `.github/workflows/maven-ci-cd.yml`
+
+Behavior:
+- CI on push/PR: `mvn clean test`
+- Release on version tags (`v*`):
+  - `mvn clean deploy -DskipTests`
+  - Publish Maven package to GitHub Packages
+  - Publish GitHub Release with generated notes + JAR asset
+
 ## GitHub Packages (Local Deploy)
 `pom.xml` is already configured to deploy to:
 - `https://maven.pkg.github.com/kskarimi/event-management`
@@ -68,3 +84,9 @@ To authenticate local Maven deploy:
 ```bash
 mvn -DskipTests deploy
 ```
+
+## Tests
+- Unit tests are available for:
+  - core service logic (`events`, `attendees`, `registration`)
+  - data change tracking aspect (`datashipper`)
+  - customer API rate-limit filter

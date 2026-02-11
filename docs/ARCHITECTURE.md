@@ -7,6 +7,11 @@ This project demonstrates a production-oriented modular monolith design for inte
 - resilient external call boundary
 - observable runtime behavior
 
+## Build Coordinates
+- `groupId`: `com.kkarimi`
+- `artifactId`: `event-management`
+- `version`: `0.0.1-SNAPSHOT`
+
 ## Base Package
 `com.kkarimi.eventmanagement`
 
@@ -55,6 +60,11 @@ Runtime configuration:
 
 Container runtime:
 - `docker-compose.yml`
+
+CI and release:
+- `.github/workflows/maven-ci-cd.yml`
+- CI: run tests on push/PR
+- Release: on tag `v*`, deploy Maven package to GitHub Packages and publish GitHub Release
 
 ## Async Contract Flow (Data Shipper)
 ```mermaid
