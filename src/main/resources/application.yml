@@ -1,6 +1,9 @@
 spring:
   application:
     name: event-management
+  main:
+    banner-mode: "off"
+    log-startup-info: false
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:mariadb://localhost:3306/event_management}
     username: ${SPRING_DATASOURCE_USERNAME:event_user}
@@ -78,6 +81,7 @@ app:
 logging:
   level:
     root: ERROR
+    org.springframework: OFF
     com.kkarimi.eventmanagement.startup: INFO
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] [traceId=%X{traceId:-},spanId=%X{spanId:-}] %logger{40} - %msg%n"

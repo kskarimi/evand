@@ -63,7 +63,10 @@ Services:
 - Logging:
   - Structured console format with `traceId` and `spanId`
   - Root log level is `ERROR`
+  - Spring framework logs are disabled in console (`org.springframework=OFF`)
+  - Spring banner/startup-info logs are disabled
   - Startup summary logs include startup duration, runtime, profiles, and key endpoints/configs
+  - Response trace headers: `X-Trace-Id`, `X-Span-Id`
 - Circuit breaker name for notifications: `notificationService`
 - Customer API rate limit:
   - Fixed window, per client IP
@@ -106,3 +109,4 @@ mvn -DskipTests deploy
   - core service logic (`events`, `attendees`, `registration`)
   - data change tracking aspect (`eventhistory`)
   - customer API rate-limit filter
+  - trace context initialization filter (trace/span propagation)
