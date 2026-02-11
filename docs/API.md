@@ -2,10 +2,10 @@
 
 Base URL: `http://localhost:8080`
 
-## Quick Flow
+## Quick Business Flow
 1. Create an event
 2. Create an attendee
-3. Register attendee in the event
+3. Register attendee in event
 
 ## cURL Examples
 
@@ -60,21 +60,45 @@ curl -X POST 'http://localhost:8080/api/registrations' \
 curl 'http://localhost:8080/api/registrations'
 ```
 
-## Common HTTP Status Codes
-- `201 Created`: Resource created successfully.
-- `200 OK`: Request successful.
-- `404 Not Found`: Event or attendee not found.
-- `409 Conflict`: No seat available for event.
+## HTTP Statuses
+- `201 Created`: successful create/register operations.
+- `200 OK`: successful read/list operations.
+- `404 Not Found`: event or attendee not found.
+- `409 Conflict`: event has no remaining seat.
+- `429 Too Many Requests`: customer API rate limit exceeded.
 
-## Monitoring and Metrics
+## Customer API Rate Limit
+Applied to:
+- `/api/attendees/**`
+- `/api/registrations/**`
+
+Default policy:
+- `60 requests per minute` per client IP.
+
+Response when exceeded:
+```json
+{"error":"rate_limit_exceeded"}
+```
+
+## Actuator and Monitoring
 - `GET /actuator/health`
 - `GET /actuator/metrics`
 - `GET /actuator/prometheus`
+- `GET /actuator/circuitbreakers`
 
-Custom business metrics:
+Business metrics:
 - `event.created.total`
 - `event.create.duration`
 - `event.lookup.duration`
 - `registration.created.total`
 - `registration.failed.total`
 - `registration.process.duration`
+
+## Circuit Breaker
+Notification boundary uses Resilience4j circuit breaker:
+- name: `notificationService`
+- fallback: graceful log fallback when call path is unavailable
+
+## Schema Migrations
+Liquibase changelog:
+- `classpath:db/changelog/db.changelog-master.yaml`

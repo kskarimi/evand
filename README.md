@@ -1,34 +1,34 @@
 # Event Management (Spring Modulith)
 
-Interview-ready modular monolith skeleton using Spring Boot + Spring Modulith + Maven.
+Modular monolith for event management with async change shipping, observability, resilience, and persistence.
 
 ## Stack
 - Java 25
-- Spring Boot
+- Spring Boot 3.5
 - Spring Modulith
 - Maven
+- MariaDB (primary data)
+- Redis (cache)
+- MongoDB (change history)
+- Liquibase (DB migrations)
+- Micrometer + Actuator + Prometheus endpoint
+- Resilience4j (circuit breaker)
+- Lombok + MapStruct
 
-## Architecture
-See: `/Users/karim/Public/event-management/docs/ARCHITECTURE.md`
-
-## API Docs
-- cURL examples: `/Users/karim/Public/event-management/docs/API.md`
+## Main Docs
+- Architecture: `/Users/karim/Public/event-management/docs/ARCHITECTURE.md`
+- API + curl: `/Users/karim/Public/event-management/docs/API.md`
 - Postman collection: `/Users/karim/Public/event-management/docs/postman/event-management.postman_collection.json`
 
-## Quick Start
+## Run Locally
 ```bash
 mvn clean test
 mvn spring-boot:run
 ```
 
-API base path: `/api`
+Base API path: `/api`
 
-Actuator endpoints:
-- `/actuator/health`
-- `/actuator/metrics`
-- `/actuator/prometheus`
-
-## Docker Compose (MariaDB + Redis + App)
+## Docker Compose
 ```bash
 docker compose up --build
 ```
@@ -38,3 +38,16 @@ Services:
 - MariaDB: `localhost:3306`
 - Redis: `localhost:6379`
 - MongoDB: `localhost:27017`
+
+## Observability and Resilience
+- Actuator endpoints:
+  - `/actuator/health`
+  - `/actuator/metrics`
+  - `/actuator/prometheus`
+  - `/actuator/circuitbreakers`
+- Circuit breaker name for notifications: `notificationService`
+- Customer API rate limit:
+  - Fixed window, per client IP
+  - Default: `60 requests/minute`
+  - Applied on `/api/attendees/**` and `/api/registrations/**`
+  - Exceed response: HTTP `429`

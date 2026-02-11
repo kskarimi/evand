@@ -1,97 +1,103 @@
-# Event Management - Skeleton
+# Event Management - Architecture
 
 ## Goal
-This project is a simple and straight modular monolith for showing my skills in software engineer.
-It uses:
-- Java 25 (Maven compiler `release`)
-- Spring Boot
-- Spring Modulith
-- Maven
+This project demonstrates a production-oriented modular monolith design for interview use:
+- clear module boundaries
+- async inter-module contract
+- resilient external call boundary
+- observable runtime behavior
 
-## Module Overview
-Base package: `com.kkarimi.eventmanagement`
+## Base Package
+`com.kkarimi.eventmanagement`
 
-Modules:
+## Modules
 1. `events`
 - Responsibility: create events, query events, reserve seats.
-- Public API: `EventCatalog`, `Event`, `NewEventCommand`.
-- Internal implementation: `events.internal.EventCatalogService`.
+- API: `EventCatalog`, `Event`, `NewEventCommand`.
 
 2. `attendees`
-- Responsibility: register and query attendees.
-- Public API: `AttendeeDirectory`, `Attendee`, `NewAttendeeCommand`.
-- Internal implementation: `attendees.internal.AttendeeDirectoryService`.
+- Responsibility: register attendees and query them.
+- API: `AttendeeDirectory`, `Attendee`, `NewAttendeeCommand`.
 
 3. `registration`
-- Responsibility: register attendee in event.
-- Dependencies: `events`, `attendees`, `notifications`.
-- Public API: `RegistrationApplication`, `Registration`, `RegistrationCommand`.
-- Internal implementation: `registration.internal.RegistrationApplicationService`.
+- Responsibility: register attendee to event.
+- Dependencies: `events`, `attendees`, `notifications`, `datashipper`.
+- API: `RegistrationApplication`, `Registration`, `RegistrationCommand`.
 
 4. `notifications`
-- Responsibility: send registration confirmation (currently logging only).
-- Public API: `NotificationGateway`.
-- Internal implementation: `notifications.internal.LoggingNotificationGateway`.
+- Responsibility: notification boundary (external call boundary).
+- API: `NotificationGateway`.
+- Resilience: Resilience4j circuit breaker (`notificationService`).
 
-5. `web`
-- Responsibility: REST API layer.
-- Dependencies: `events`, `attendees`, `registration`.
-- Controllers: `EventController`, `AttendeeController`, `RegistrationController`.
-
-6. `datashipper`
-- Responsibility: asynchronously ship data-change contracts across modules through application events and keep change history.
+5. `datashipper`
+- Responsibility: async change contract and historical change storage.
+- Contract mechanism: Spring Application Events.
+- AOP capture annotation: `@TrackDataChange`.
+- Event: `DataChangedEvent`.
 - Storage: MongoDB collection `change_history`.
-- Mechanism:
-  - Other modules mark mutating methods with `@TrackDataChange`.
-  - `ChangeTrackingAspect` publishes `DataChangedEvent`.
-  - `ChangeHistoryEventListener` handles event asynchronously and persists history.
 
-## Why this structure is good for interviews
-- Clear module boundaries with explicit dependencies.
-- Internal implementations hidden in `.internal` packages.
-- Stable module APIs (interfaces + command/record models).
-- Easy to evolve from in-memory storage to JPA without breaking module contracts.
+6. `metrics`
+- Responsibility: centralized metric instrumentation via AOP.
+- AOP annotation: `@MeasuredOperation`.
 
-## Infrastructure Integration
-- MariaDB is used as the system of record through Spring Data JPA.
-- Redis is used for Spring Cache (event lookup/list caching).
-- MongoDB is used by `datashipper` module for historical change data.
-- Configuration is in `/Users/karim/Public/event-management/src/main/resources/application.yml`.
-- Container runtime setup is in `/Users/karim/Public/event-management/docker-compose.yml`.
+7. `web`
+- Responsibility: REST controllers + request filtering.
+- Includes simple customer API rate limiting filter.
 
-## REST Endpoints
-- `POST /api/events`
-- `GET /api/events`
-- `GET /api/events/{eventId}`
-- `POST /api/attendees`
-- `GET /api/attendees`
-- `POST /api/registrations`
-- `GET /api/registrations`
+## Data and Infrastructure
+- MariaDB: system of record for `events`, `attendees`, `registrations`.
+- Liquibase: schema migration source of truth.
+- Redis: Spring Cache backend.
+- MongoDB: change history for `datashipper` module.
 
-## Sequence Diagram
+Runtime configuration:
+- `/Users/karim/Public/event-management/src/main/resources/application.yml`
+
+Container runtime:
+- `/Users/karim/Public/event-management/docker-compose.yml`
+
+## Async Contract Flow (Data Shipper)
+```mermaid
+sequenceDiagram
+    participant Service as "Domain Service (events/attendees/registration)"
+    participant Aspect as "ChangeTrackingAspect"
+    participant AppEvent as "ApplicationEventPublisher"
+    participant Listener as "ChangeHistoryEventListener (@Async)"
+    participant Mongo as "MongoDB change_history"
+
+    Service->>Aspect: Method with @TrackDataChange
+    Aspect->>Service: proceed()
+    Service-->>Aspect: result
+    Aspect->>AppEvent: publish DataChangedEvent
+    AppEvent-->>Listener: dispatch event
+    Listener->>Mongo: save ChangeHistoryDocument
+```
+
+## Registration Flow (Business)
 ```mermaid
 sequenceDiagram
     participant Client
-    participant Web as "Web Module (RegistrationController)"
+    participant Web as "RegistrationController"
     participant Reg as "Registration Module"
     participant Events as "Events Module"
     participant Attendees as "Attendees Module"
     participant Notif as "Notifications Module"
 
-    Client->>Web: POST /api/registrations {eventId, attendeeId}
+    Client->>Web: POST /api/registrations
     Web->>Reg: register(command)
-    Reg->>Events: findById(eventId)
-    Events-->>Reg: Event
-    Reg->>Attendees: findById(attendeeId)
-    Attendees-->>Reg: Attendee
-    Reg->>Events: reserveSeat(eventId)
-    Events-->>Reg: Event(updated reservedSeats)
-    Reg->>Reg: create Registration
-    Reg->>Notif: sendRegistrationConfirmation(registration)
-    Notif-->>Reg: OK
+    Reg->>Events: findById + reserveSeat
+    Reg->>Attendees: findById
+    Reg->>Notif: sendRegistrationConfirmation
     Reg-->>Web: Registration
-    Web-->>Client: 201 Created + Registration
+    Web-->>Client: 201 Created
 ```
+
+## Key Cross-Cutting Patterns
+- AOP Metrics: `@MeasuredOperation`
+- AOP Change Capture: `@TrackDataChange`
+- Async internal contract: Spring application events
+- Resilience: circuit breaker for external notification call
+- Protection: fixed-window per-IP rate limiting for customer APIs
 
 ## Build and Run
 ```bash
@@ -99,12 +105,5 @@ mvn clean test
 mvn spring-boot:run
 ```
 
-Note:
-- On Java 25, Spring Modulith's ArchUnit-based verification is currently skipped in `ModularityTest` because ArchUnit does not yet support Java 25 class files.
-- The test runs automatically on Java 24 and below.
-
-## Next recommended improvements
-1. Add persistence per module (JPA repositories in each module).
-2. Add domain events between modules (e.g., registration confirmed).
-3. Add integration tests for endpoint flow.
-4. Add authentication/authorization if requested in final project brief.
+## Java 25 Note
+`ModularityTest` is conditionally skipped on Java 25 because current ArchUnit support for class-file version 69 is not yet available.
