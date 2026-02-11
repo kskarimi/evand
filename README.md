@@ -51,3 +51,20 @@ Services:
   - Default: `60 requests/minute`
   - Applied on `/api/attendees/**` and `/api/registrations/**`
   - Exceed response: HTTP `429`
+
+## GitHub Packages (Local Deploy)
+`pom.xml` is already configured to deploy to:
+- `https://maven.pkg.github.com/kskarimi/event-management`
+
+To authenticate local Maven deploy:
+1. Create a GitHub Personal Access Token with:
+   - `read:packages`
+   - `write:packages`
+   - `repo` (if repository is private)
+2. Copy project template:
+   - `.mvn/settings-example.xml` -> `~/.m2/settings.xml`
+3. Replace `YOUR_GITHUB_PAT` with your token.
+4. Run:
+```bash
+mvn -DskipTests deploy
+```
