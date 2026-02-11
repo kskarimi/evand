@@ -1,0 +1,231 @@
+openapi: 3.0.3
+info:
+  title: Event Management API
+  version: 1.0.0
+  description: Modular Spring Boot API for events, attendees, and registrations.
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/events:
+    get:
+      tags: [Events]
+      summary: List events
+      operationId: listEvents
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+    post:
+      tags: [Events]
+      summary: Create event
+      operationId: createEvent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEventRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+  /api/events/{eventId}:
+    get:
+      tags: [Events]
+      summary: Get event by ID
+      operationId: getEventById
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '404':
+          description: Event not found
+  /api/attendees:
+    get:
+      tags: [Attendees]
+      summary: List attendees
+      operationId: listAttendees
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Attendee'
+    post:
+      tags: [Attendees]
+      summary: Create attendee
+      operationId: createAttendee
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAttendeeRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attendee'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/registrations:
+    get:
+      tags: [Registrations]
+      summary: List registrations
+      operationId: listRegistrations
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Registration'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags: [Registrations]
+      summary: Register attendee in event
+      operationId: createRegistration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRegistrationRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Registration'
+        '404':
+          description: Event or attendee not found
+        '409':
+          description: Event has no available seats
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    Event:
+      type: object
+      required: [id, title, startsAt, capacity, reservedSeats]
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        startsAt:
+          type: string
+          format: date-time
+        capacity:
+          type: integer
+          format: int32
+          minimum: 1
+        reservedSeats:
+          type: integer
+          format: int32
+          minimum: 0
+    Attendee:
+      type: object
+      required: [id, fullName, email]
+      properties:
+        id:
+          type: string
+          format: uuid
+        fullName:
+          type: string
+        email:
+          type: string
+          format: email
+    Registration:
+      type: object
+      required: [id, eventId, attendeeId, registeredAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        eventId:
+          type: string
+          format: uuid
+        attendeeId:
+          type: string
+          format: uuid
+        registeredAt:
+          type: string
+          format: date-time
+    CreateEventRequest:
+      type: object
+      required: [title, startsAt, capacity]
+      properties:
+        title:
+          type: string
+        startsAt:
+          type: string
+          format: date-time
+        capacity:
+          type: integer
+          format: int32
+          minimum: 1
+    CreateAttendeeRequest:
+      type: object
+      required: [fullName, email]
+      properties:
+        fullName:
+          type: string
+        email:
+          type: string
+          format: email
+    CreateRegistrationRequest:
+      type: object
+      required: [eventId, attendeeId]
+      properties:
+        eventId:
+          type: string
+          format: uuid
+        attendeeId:
+          type: string
+          format: uuid
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string

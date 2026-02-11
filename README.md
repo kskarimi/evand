@@ -17,8 +17,8 @@ Modular monolith for event management with async event history tracking, observa
 
 ## Main Docs
 - Architecture: `docs/ARCHITECTURE.md`
-- API + curl: `docs/API.md`
-- Postman collection: `docs/postman/event-management.postman_collection.json`
+- OpenAPI docs: `docs/openapi.yaml`
+- API usage: `docs/API.md`
 - Release notes: `docs/RELEASE_NOTES.md`
 
 
@@ -34,6 +34,8 @@ mvn spring-boot:run
 ```
 
 Base API path: `/api`
+OpenAPI JSON: `/v3/api-docs`
+Swagger UI: `/swagger-ui.html`
 
 ## Docker Compose
 ```bash
