@@ -10,7 +10,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.mofid</groupId>
+    <groupId>com.kkarimi</groupId>
     <artifactId>event-management</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>event-management</name>
