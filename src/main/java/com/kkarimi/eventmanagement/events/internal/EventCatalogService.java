@@ -3,9 +3,7 @@ package com.kkarimi.eventmanagement.events.internal;
 import com.kkarimi.eventmanagement.events.Event;
 import com.kkarimi.eventmanagement.events.EventCatalog;
 import com.kkarimi.eventmanagement.events.NewEventCommand;
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Timer;
+import com.kkarimi.eventmanagement.metrics.MeasuredOperation;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -21,49 +19,38 @@ import java.util.UUID;
 class EventCatalogService implements EventCatalog {
 
     private final EventJpaRepository repository;
-    private final Counter eventCreatedCounter;
-    private final Timer eventCreateTimer;
-    private final Timer eventLookupTimer;
 
-    EventCatalogService(EventJpaRepository repository, MeterRegistry meterRegistry) {
+    EventCatalogService(EventJpaRepository repository) {
         this.repository = repository;
-        this.eventCreatedCounter = Counter.builder("event.created.total")
-                .description("Total number of created events")
-                .register(meterRegistry);
-        this.eventCreateTimer = Timer.builder("event.create.duration")
-                .description("Time taken to create an event")
-                .register(meterRegistry);
-        this.eventLookupTimer = Timer.builder("event.lookup.duration")
-                .description("Time taken to read events")
-                .register(meterRegistry);
     }
 
     @Override
     @Transactional
     @CacheEvict(cacheNames = {"eventById", "eventList"}, allEntries = true)
+    @MeasuredOperation(
+            timer = "event.create.duration",
+            successCounter = "event.created.total"
+    )
     public Event create(NewEventCommand command) {
-        return eventCreateTimer.record(() -> {
-            if (command.capacity() <= 0) {
-                throw new IllegalArgumentException("Event capacity must be greater than zero");
-            }
-            UUID id = UUID.randomUUID();
-            EventJpaEntity entity = new EventJpaEntity(
-                    id,
-                    command.title(),
-                    command.startsAt(),
-                    command.capacity(),
-                    0
-            );
-            Event created = toModel(repository.save(entity));
-            eventCreatedCounter.increment();
-            return created;
-        });
+        if (command.capacity() <= 0) {
+            throw new IllegalArgumentException("Event capacity must be greater than zero");
+        }
+        UUID id = UUID.randomUUID();
+        EventJpaEntity entity = new EventJpaEntity(
+                id,
+                command.title(),
+                command.startsAt(),
+                command.capacity(),
+                0
+        );
+        return toModel(repository.save(entity));
     }
 
     @Override
     @Cacheable(cacheNames = "eventById", key = "#eventId")
+    @MeasuredOperation(timer = "event.lookup.duration")
     public Optional<Event> findById(UUID eventId) {
-        return eventLookupTimer.record(() -> repository.findById(eventId).map(this::toModel));
+        return repository.findById(eventId).map(this::toModel);
     }
 
     @Override
@@ -83,11 +70,12 @@ class EventCatalogService implements EventCatalog {
 
     @Override
     @Cacheable(cacheNames = "eventList")
+    @MeasuredOperation(timer = "event.lookup.duration")
     public List<Event> findAll() {
-        return eventLookupTimer.record(() -> repository.findAll().stream()
+        return repository.findAll().stream()
                 .map(this::toModel)
                 .sorted(Comparator.comparing(Event::startsAt))
-                .toList());
+                .toList();
     }
 
     private Event toModel(EventJpaEntity entity) {
