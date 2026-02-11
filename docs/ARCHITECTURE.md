@@ -38,7 +38,7 @@ Modules:
 - Dependencies: `events`, `attendees`, `registration`.
 - Controllers: `EventController`, `AttendeeController`, `RegistrationController`.
 
-6. `changeshipping`
+6. `datashipper`
 - Responsibility: asynchronously ship data-change contracts across modules through application events and keep change history.
 - Storage: MongoDB collection `change_history`.
 - Mechanism:
@@ -55,7 +55,7 @@ Modules:
 ## Infrastructure Integration
 - MariaDB is used as the system of record through Spring Data JPA.
 - Redis is used for Spring Cache (event lookup/list caching).
-- MongoDB is used by `changeshipping` module for historical change data.
+- MongoDB is used by `datashipper` module for historical change data.
 - Configuration is in `/Users/karim/Public/event-management/src/main/resources/application.yml`.
 - Container runtime setup is in `/Users/karim/Public/event-management/docker-compose.yml`.
 

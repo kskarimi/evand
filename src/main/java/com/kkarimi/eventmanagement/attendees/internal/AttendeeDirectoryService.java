@@ -1,6 +1,6 @@
 package com.kkarimi.eventmanagement.attendees.internal;
 
-import com.kkarimi.eventmanagement.changeshipping.TrackDataChange;
+import com.kkarimi.eventmanagement.datashipper.TrackDataChange;
 import com.kkarimi.eventmanagement.attendees.Attendee;
 import com.kkarimi.eventmanagement.attendees.AttendeeDirectory;
 import com.kkarimi.eventmanagement.attendees.NewAttendeeCommand;

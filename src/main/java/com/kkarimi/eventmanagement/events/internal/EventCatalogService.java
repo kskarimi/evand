@@ -1,6 +1,6 @@
 package com.kkarimi.eventmanagement.events.internal;
 
-import com.kkarimi.eventmanagement.changeshipping.TrackDataChange;
+import com.kkarimi.eventmanagement.datashipper.TrackDataChange;
 import com.kkarimi.eventmanagement.events.Event;
 import com.kkarimi.eventmanagement.events.EventCatalog;
 import com.kkarimi.eventmanagement.events.NewEventCommand;

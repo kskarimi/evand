@@ -1,7 +1,7 @@
 package com.kkarimi.eventmanagement.registration.internal;
 
 import com.kkarimi.eventmanagement.attendees.AttendeeDirectory;
-import com.kkarimi.eventmanagement.changeshipping.TrackDataChange;
+import com.kkarimi.eventmanagement.datashipper.TrackDataChange;
 import com.kkarimi.eventmanagement.events.EventCatalog;
 import com.kkarimi.eventmanagement.metrics.MeasuredOperation;
 import com.kkarimi.eventmanagement.notifications.NotificationGateway;
