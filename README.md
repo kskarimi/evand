@@ -25,7 +25,7 @@ Modular monolith for event management with async event history tracking, observa
 ## Project Coordinates
 - `groupId`: `com.kkarimi`
 - `artifactId`: `event-management`
-- `version`: `0.0.1-SNAPSHOT`
+- `version`: `2.0.0-SNAPSHOT`
 
 ## Run Locally
 ```bash

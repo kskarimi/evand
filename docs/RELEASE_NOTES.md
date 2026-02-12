@@ -1,5 +1,25 @@
 # Release Notes
 
+## Upcoming Release
+
+### Highlights
+- Enforced registration uniqueness per event: the same attendee cannot register twice in one event.
+- Added conflict handling for duplicate registration (`DUPLICATE_REGISTRATION`, HTTP `409`).
+- Migrated primary keys from UUID to database identity auto-increment (`BIGINT`), mapped as `Long` in API/domain layers.
+- Updated Liquibase schema and constraints to match new ID strategy.
+- Added Bruno API collection assets for attendees/events/registrations usage.
+- Refreshed API and OpenAPI documentation to reflect numeric IDs and current conflict responses.
+- Improved CI pipeline steps for build, tests, style checks, and release artifacts.
+- Added/updated tests for latest error-handling and registration behavior.
+
+### Breaking Changes
+- API identifiers are now numeric (`int64`) instead of UUID strings.
+- Registration request payload now expects numeric `eventId` and `attendeeId`.
+
+### Upgrade Notes
+- Update API clients and integrations to send/parse numeric IDs.
+- If you have existing UUID-based data, plan a data migration before deploying this release to shared environments.
+
 ## Current Release
 
 ### Highlights
