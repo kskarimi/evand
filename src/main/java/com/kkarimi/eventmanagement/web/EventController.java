@@ -3,6 +3,7 @@ package com.kkarimi.eventmanagement.web;
 import com.kkarimi.eventmanagement.events.Event;
 import com.kkarimi.eventmanagement.events.EventCatalog;
 import com.kkarimi.eventmanagement.events.NewEventCommand;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -17,9 +18,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @RestController
@@ -34,14 +35,14 @@ class EventController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    Event create(@RequestBody CreateEventRequest request) {
+    Event create(@Valid @RequestBody CreateEventRequest request) {
         return eventCatalog.create(new NewEventCommand(request.title(), request.startsAt(), request.capacity()));
     }
 
     @GetMapping("/{eventId}")
     Event getById(@PathVariable UUID eventId) {
         return eventCatalog.findById(eventId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));
+                .orElseThrow(() -> new NoSuchElementException("Event not found: " + eventId));
     }
 
     @GetMapping

@@ -3,6 +3,7 @@ package com.kkarimi.eventmanagement.web;
 import com.kkarimi.eventmanagement.attendees.Attendee;
 import com.kkarimi.eventmanagement.attendees.AttendeeDirectory;
 import com.kkarimi.eventmanagement.attendees.NewAttendeeCommand;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +28,7 @@ class AttendeeController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    Attendee create(@RequestBody CreateAttendeeRequest request) {
+    Attendee create(@Valid @RequestBody CreateAttendeeRequest request) {
         return attendeeDirectory.register(new NewAttendeeCommand(request.fullName(), request.email()));
     }
 

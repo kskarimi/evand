@@ -1,12 +1,14 @@
 package com.kkarimi.eventmanagement.attendees.internal;
 
 import com.kkarimi.eventmanagement.attendees.Attendee;
+import com.kkarimi.eventmanagement.attendees.DuplicateAttendeeException;
 import com.kkarimi.eventmanagement.attendees.NewAttendeeCommand;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +19,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -39,6 +42,7 @@ class AttendeeDirectoryServiceTest {
         AttendeeJpaEntity entity = new AttendeeJpaEntity(id, command.fullName(), command.email());
         Attendee model = new Attendee(id, command.fullName(), command.email());
 
+        when(repository.existsByEmailIgnoreCase(command.email())).thenReturn(false);
         when(mapper.toEntity(any(UUID.class), any(NewAttendeeCommand.class))).thenReturn(entity);
         when(repository.save(entity)).thenReturn(entity);
         when(mapper.toModel(entity)).thenReturn(model);
@@ -46,6 +50,26 @@ class AttendeeDirectoryServiceTest {
         Attendee result = service.register(command);
 
         assertEquals(model, result);
+    }
+
+    @Test
+    void registerShouldFailWhenEmailAlreadyExists() {
+        NewAttendeeCommand command = new NewAttendeeCommand("Karim", "karim@example.com");
+        when(repository.existsByEmailIgnoreCase(command.email())).thenReturn(true);
+
+        assertThrows(DuplicateAttendeeException.class, () -> service.register(command));
+    }
+
+    @Test
+    void registerShouldTranslateDataIntegrityViolationToDuplicateAttendeeException() {
+        NewAttendeeCommand command = new NewAttendeeCommand("Karim", "karim@example.com");
+        UUID id = UUID.randomUUID();
+        AttendeeJpaEntity entity = new AttendeeJpaEntity(id, command.fullName(), command.email());
+        when(repository.existsByEmailIgnoreCase(command.email())).thenReturn(false);
+        when(mapper.toEntity(any(UUID.class), any(NewAttendeeCommand.class))).thenReturn(entity);
+        when(repository.save(entity)).thenThrow(new DataIntegrityViolationException("duplicate"));
+
+        assertThrows(DuplicateAttendeeException.class, () -> service.register(command));
     }
 
     @Test
