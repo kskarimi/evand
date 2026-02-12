@@ -24,7 +24,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -56,8 +55,8 @@ class RegistrationApplicationServiceTest {
 
     @Test
     void registerShouldPersistAndNotify() {
-        UUID eventId = UUID.randomUUID();
-        UUID attendeeId = UUID.randomUUID();
+        Long eventId = 1L;
+        Long attendeeId = 2L;
         RegistrationCommand command = new RegistrationCommand(eventId, attendeeId);
 
         when(eventCatalog.findById(eventId)).thenReturn(Optional.of(new Event(eventId, "E", LocalDateTime.now().plusDays(1), 10, 1)));
@@ -65,6 +64,11 @@ class RegistrationApplicationServiceTest {
         when(mapper.toEntity(any(Registration.class))).thenAnswer(inv -> {
             Registration r = inv.getArgument(0);
             return new RegistrationJpaEntity(r.id(), r.eventId(), r.attendeeId(), r.registeredAt());
+        });
+        when(repository.save(any(RegistrationJpaEntity.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(mapper.toModel(any(RegistrationJpaEntity.class))).thenAnswer(inv -> {
+            RegistrationJpaEntity entity = inv.getArgument(0);
+            return new Registration(entity.getId(), entity.getEventId(), entity.getAttendeeId(), entity.getRegisteredAt());
         });
 
         Registration result = service.register(command);
@@ -82,8 +86,8 @@ class RegistrationApplicationServiceTest {
 
     @Test
     void registerShouldFailWhenEventMissing() {
-        UUID eventId = UUID.randomUUID();
-        UUID attendeeId = UUID.randomUUID();
+        Long eventId = 1L;
+        Long attendeeId = 2L;
 
         when(eventCatalog.findById(eventId)).thenReturn(Optional.empty());
 
@@ -95,8 +99,8 @@ class RegistrationApplicationServiceTest {
 
     @Test
     void registerShouldFailWhenAttendeeMissing() {
-        UUID eventId = UUID.randomUUID();
-        UUID attendeeId = UUID.randomUUID();
+        Long eventId = 1L;
+        Long attendeeId = 2L;
 
         when(eventCatalog.findById(eventId)).thenReturn(Optional.of(new Event(eventId, "E", LocalDateTime.now().plusDays(1), 10, 0)));
         when(attendeeDirectory.findById(attendeeId)).thenReturn(Optional.empty());
@@ -109,8 +113,8 @@ class RegistrationApplicationServiceTest {
 
     @Test
     void registerShouldFailWhenAttendeeAlreadyRegisteredForEvent() {
-        UUID eventId = UUID.randomUUID();
-        UUID attendeeId = UUID.randomUUID();
+        Long eventId = 1L;
+        Long attendeeId = 2L;
 
         when(eventCatalog.findById(eventId)).thenReturn(Optional.of(new Event(eventId, "E", LocalDateTime.now().plusDays(1), 10, 0)));
         when(attendeeDirectory.findById(attendeeId)).thenReturn(Optional.of(new Attendee(attendeeId, "Karim", "k@example.com")));
@@ -125,8 +129,8 @@ class RegistrationApplicationServiceTest {
 
     @Test
     void findAllShouldMapEntities() {
-        RegistrationJpaEntity e1 = new RegistrationJpaEntity(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), Instant.now());
-        RegistrationJpaEntity e2 = new RegistrationJpaEntity(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), Instant.now());
+        RegistrationJpaEntity e1 = new RegistrationJpaEntity(1L, 10L, 100L, Instant.now());
+        RegistrationJpaEntity e2 = new RegistrationJpaEntity(2L, 20L, 200L, Instant.now());
         Registration m1 = new Registration(e1.getId(), e1.getEventId(), e1.getAttendeeId(), e1.getRegisteredAt());
         Registration m2 = new Registration(e2.getId(), e2.getEventId(), e2.getAttendeeId(), e2.getRegisteredAt());
         Pageable pageable = PageRequest.of(0, 20);

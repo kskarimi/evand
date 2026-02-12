@@ -1,10 +1,8 @@
 package com.kkarimi.eventmanagement.registration;
 
-import java.util.UUID;
-
 public class DuplicateRegistrationException extends RuntimeException {
 
-    public DuplicateRegistrationException(UUID eventId, UUID attendeeId) {
+    public DuplicateRegistrationException(Long eventId, Long attendeeId) {
         super("Attendee is already registered for this event. eventId=" + eventId + ", attendeeId=" + attendeeId);
     }
 }

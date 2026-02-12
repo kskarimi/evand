@@ -1,7 +1,7 @@
 databaseChangeLog:
   - changeSet:
       id: 007-add-unique-constraint-registrations-event-attendee
-      author: codex
+      author: kamalkarimi
       changes:
         - addUniqueConstraint:
             tableName: registrations

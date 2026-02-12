@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.NoSuchElementException;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -51,14 +50,14 @@ class RegistrationApplicationService implements RegistrationApplication {
         eventCatalog.reserveSeat(command.eventId());
 
         Registration registration = new Registration(
-                UUID.randomUUID(),
+                null,
                 command.eventId(),
                 command.attendeeId(),
                 Instant.now()
         );
-        repository.save(mapper.toEntity(registration));
-        notificationGateway.sendRegistrationConfirmation(registration);
-        return registration;
+        Registration persistedRegistration = mapper.toModel(repository.save(mapper.toEntity(registration)));
+        notificationGateway.sendRegistrationConfirmation(persistedRegistration);
+        return persistedRegistration;
     }
 
     @Override

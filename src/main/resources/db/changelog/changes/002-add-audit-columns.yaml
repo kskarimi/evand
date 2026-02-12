@@ -1,7 +1,7 @@
 databaseChangeLog:
   - changeSet:
       id: 004-add-audit-columns-events
-      author: codex
+      author: kamalkarimi
       changes:
         - addColumn:
             tableName: events
@@ -21,7 +21,7 @@ databaseChangeLog:
 
   - changeSet:
       id: 005-add-audit-columns-attendees
-      author: codex
+      author: kamalkarimi
       changes:
         - addColumn:
             tableName: attendees
@@ -41,7 +41,7 @@ databaseChangeLog:
 
   - changeSet:
       id: 006-add-audit-columns-registrations
-      author: codex
+      author: kamalkarimi
       changes:
         - addColumn:
             tableName: registrations

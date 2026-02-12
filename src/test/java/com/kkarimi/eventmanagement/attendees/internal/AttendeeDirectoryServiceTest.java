@@ -16,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -38,12 +37,12 @@ class AttendeeDirectoryServiceTest {
     @Test
     void registerShouldPersistAndReturnMappedModel() {
         NewAttendeeCommand command = new NewAttendeeCommand("Karim", "karim@example.com");
-        UUID id = UUID.randomUUID();
+        Long id = 1L;
         AttendeeJpaEntity entity = new AttendeeJpaEntity(id, command.fullName(), command.email());
         Attendee model = new Attendee(id, command.fullName(), command.email());
 
         when(repository.existsByEmailIgnoreCase(command.email())).thenReturn(false);
-        when(mapper.toEntity(any(UUID.class), any(NewAttendeeCommand.class))).thenReturn(entity);
+        when(mapper.toEntity(any(NewAttendeeCommand.class))).thenReturn(entity);
         when(repository.save(entity)).thenReturn(entity);
         when(mapper.toModel(entity)).thenReturn(model);
 
@@ -63,10 +62,10 @@ class AttendeeDirectoryServiceTest {
     @Test
     void registerShouldTranslateDataIntegrityViolationToDuplicateAttendeeException() {
         NewAttendeeCommand command = new NewAttendeeCommand("Karim", "karim@example.com");
-        UUID id = UUID.randomUUID();
+        Long id = 1L;
         AttendeeJpaEntity entity = new AttendeeJpaEntity(id, command.fullName(), command.email());
         when(repository.existsByEmailIgnoreCase(command.email())).thenReturn(false);
-        when(mapper.toEntity(any(UUID.class), any(NewAttendeeCommand.class))).thenReturn(entity);
+        when(mapper.toEntity(any(NewAttendeeCommand.class))).thenReturn(entity);
         when(repository.save(entity)).thenThrow(new DataIntegrityViolationException("duplicate"));
 
         assertThrows(DuplicateAttendeeException.class, () -> service.register(command));
@@ -74,7 +73,7 @@ class AttendeeDirectoryServiceTest {
 
     @Test
     void findByIdShouldReturnMappedValue() {
-        UUID id = UUID.randomUUID();
+        Long id = 1L;
         AttendeeJpaEntity entity = new AttendeeJpaEntity(id, "Karim", "karim@example.com");
         Attendee model = new Attendee(id, "Karim", "karim@example.com");
 
@@ -88,8 +87,8 @@ class AttendeeDirectoryServiceTest {
 
     @Test
     void findAllShouldMapAllAttendees() {
-        AttendeeJpaEntity e1 = new AttendeeJpaEntity(UUID.randomUUID(), "A", "a@example.com");
-        AttendeeJpaEntity e2 = new AttendeeJpaEntity(UUID.randomUUID(), "B", "b@example.com");
+        AttendeeJpaEntity e1 = new AttendeeJpaEntity(1L, "A", "a@example.com");
+        AttendeeJpaEntity e2 = new AttendeeJpaEntity(2L, "B", "b@example.com");
         Attendee m1 = new Attendee(e1.getId(), "A", "a@example.com");
         Attendee m2 = new Attendee(e2.getId(), "B", "b@example.com");
         Pageable pageable = PageRequest.of(0, 20);

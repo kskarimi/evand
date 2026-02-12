@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -36,15 +35,14 @@ class EventCatalogService implements EventCatalog {
         if (command.capacity() <= 0) {
             throw new IllegalArgumentException("Event capacity must be greater than zero");
         }
-        UUID id = UUID.randomUUID();
-        EventJpaEntity entity = mapper.toEntity(id, command);
+        EventJpaEntity entity = mapper.toEntity(command);
         return mapper.toModel(repository.save(entity));
     }
 
     @Override
     @Cacheable(cacheNames = "eventById", key = "#eventId")
     @MeasuredOperation(timer = "event.lookup.duration")
-    public Optional<Event> findById(UUID eventId) {
+    public Optional<Event> findById(Long eventId) {
         return repository.findById(eventId).map(mapper::toModel);
     }
 
@@ -52,7 +50,7 @@ class EventCatalogService implements EventCatalog {
     @Transactional
     @CacheEvict(cacheNames = {"eventById", "eventList"}, allEntries = true)
     @TrackEventHistory(module = "events", action = "reserve-seat", entity = "event")
-    public Event reserveSeat(UUID eventId) {
+    public Event reserveSeat(Long eventId) {
         EventJpaEntity entity = repository.findByIdForUpdate(eventId)
                 .orElseThrow(() -> new NoSuchElementException("Event not found: " + eventId));
 

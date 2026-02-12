@@ -3,6 +3,8 @@ package com.kkarimi.eventmanagement.events.internal;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
@@ -17,7 +19,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "events")
@@ -29,7 +30,8 @@ import java.util.UUID;
 class EventJpaEntity {
 
     @Id
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(nullable = false)
     private String title;
@@ -55,7 +57,7 @@ class EventJpaEntity {
     private Instant updatedAt;
 
     EventJpaEntity(
-            UUID id,
+            Long id,
             String title,
             LocalDateTime startsAt,
             int capacity,

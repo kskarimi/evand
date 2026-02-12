@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/events")
@@ -40,7 +39,7 @@ class EventController {
     }
 
     @GetMapping("/{eventId}")
-    Event getById(@PathVariable UUID eventId) {
+    Event getById(@PathVariable Long eventId) {
         return eventCatalog.findById(eventId)
                 .orElseThrow(() -> new NoSuchElementException("Event not found: " + eventId));
     }

@@ -15,7 +15,6 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -37,10 +36,10 @@ class EventCatalogServiceTest {
     @Test
     void createShouldPersistAndReturnMappedModel() {
         NewEventCommand command = new NewEventCommand("Event", LocalDateTime.now().plusDays(1), 10);
-        EventJpaEntity entity = new EventJpaEntity(UUID.randomUUID(), "Event", command.startsAt(), 10, 0, null);
+        EventJpaEntity entity = new EventJpaEntity(1L, "Event", command.startsAt(), 10, 0, null);
         Event model = new Event(entity.getId(), "Event", command.startsAt(), 10, 0);
 
-        when(mapper.toEntity(any(UUID.class), any(NewEventCommand.class))).thenReturn(entity);
+        when(mapper.toEntity(any(NewEventCommand.class))).thenReturn(entity);
         when(repository.save(entity)).thenReturn(entity);
         when(mapper.toModel(entity)).thenReturn(model);
 
@@ -58,7 +57,7 @@ class EventCatalogServiceTest {
 
     @Test
     void findByIdShouldReturnMappedEvent() {
-        UUID id = UUID.randomUUID();
+        Long id = 1L;
         EventJpaEntity entity = new EventJpaEntity(id, "Event", LocalDateTime.now().plusDays(1), 10, 0, null);
         Event model = new Event(id, "Event", entity.getStartsAt(), 10, 0);
 
@@ -72,7 +71,7 @@ class EventCatalogServiceTest {
 
     @Test
     void reserveSeatShouldIncrementReservedSeats() {
-        UUID id = UUID.randomUUID();
+        Long id = 1L;
         EventJpaEntity entity = new EventJpaEntity(id, "Event", LocalDateTime.now().plusDays(1), 10, 2, null);
         Event model = new Event(id, "Event", entity.getStartsAt(), 10, 3);
 
@@ -87,7 +86,7 @@ class EventCatalogServiceTest {
 
     @Test
     void reserveSeatShouldFailWhenCapacityReached() {
-        UUID id = UUID.randomUUID();
+        Long id = 1L;
         EventJpaEntity entity = new EventJpaEntity(id, "Event", LocalDateTime.now().plusDays(1), 2, 2, null);
 
         when(repository.findByIdForUpdate(id)).thenReturn(Optional.of(entity));
@@ -99,8 +98,8 @@ class EventCatalogServiceTest {
     void findAllShouldReturnPagedMappedEvents() {
         LocalDateTime late = LocalDateTime.now().plusDays(2);
         LocalDateTime early = LocalDateTime.now().plusDays(1);
-        EventJpaEntity e1 = new EventJpaEntity(UUID.randomUUID(), "Late", late, 10, 0, null);
-        EventJpaEntity e2 = new EventJpaEntity(UUID.randomUUID(), "Early", early, 10, 0, null);
+        EventJpaEntity e1 = new EventJpaEntity(1L, "Late", late, 10, 0, null);
+        EventJpaEntity e2 = new EventJpaEntity(2L, "Early", early, 10, 0, null);
         Event m1 = new Event(e1.getId(), "Late", late, 10, 0);
         Event m2 = new Event(e2.getId(), "Early", early, 10, 0);
         Pageable pageable = PageRequest.of(0, 20);

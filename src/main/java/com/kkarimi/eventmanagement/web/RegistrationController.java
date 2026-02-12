@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.UUID;
-
 @RestController
 @RequestMapping("/api/registrations")
 class RegistrationController {
@@ -38,6 +36,6 @@ class RegistrationController {
         return PageResponse.from(registrationApplication.findAll(pageable));
     }
 
-    record CreateRegistrationRequest(@NotNull UUID eventId, @NotNull UUID attendeeId) {
+    record CreateRegistrationRequest(@NotNull Long eventId, @NotNull Long attendeeId) {
     }
 }

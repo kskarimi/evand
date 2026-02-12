@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -29,8 +28,7 @@ class AttendeeDirectoryService implements AttendeeDirectory {
         if (repository.existsByEmailIgnoreCase(command.email())) {
             throw new DuplicateAttendeeException(command.email());
         }
-        UUID id = UUID.randomUUID();
-        AttendeeJpaEntity entity = mapper.toEntity(id, command);
+        AttendeeJpaEntity entity = mapper.toEntity(command);
         try {
             return mapper.toModel(repository.save(entity));
         } catch (DataIntegrityViolationException exception) {
@@ -39,7 +37,7 @@ class AttendeeDirectoryService implements AttendeeDirectory {
     }
 
     @Override
-    public Optional<Attendee> findById(UUID attendeeId) {
+    public Optional<Attendee> findById(Long attendeeId) {
         return repository.findById(attendeeId).map(mapper::toModel);
     }
 

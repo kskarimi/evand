@@ -1,14 +1,15 @@
 databaseChangeLog:
   - changeSet:
       id: 001-create-events
-      author: codex
+      author: kamalkarimi
       changes:
         - createTable:
             tableName: events
             columns:
               - column:
                   name: id
-                  type: BINARY(16)
+                  type: BIGINT
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -38,14 +39,15 @@ databaseChangeLog:
 
   - changeSet:
       id: 002-create-attendees
-      author: codex
+      author: kamalkarimi
       changes:
         - createTable:
             tableName: attendees
             columns:
               - column:
                   name: id
-                  type: BINARY(16)
+                  type: BIGINT
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -66,25 +68,26 @@ databaseChangeLog:
 
   - changeSet:
       id: 003-create-registrations
-      author: codex
+      author: kamalkarimi
       changes:
         - createTable:
             tableName: registrations
             columns:
               - column:
                   name: id
-                  type: BINARY(16)
+                  type: BIGINT
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
               - column:
                   name: event_id
-                  type: BINARY(16)
+                  type: BIGINT
                   constraints:
                     nullable: false
               - column:
                   name: attendee_id
-                  type: BINARY(16)
+                  type: BIGINT
                   constraints:
                     nullable: false
               - column:

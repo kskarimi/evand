@@ -7,11 +7,10 @@ import org.springframework.data.repository.query.Param;
 
 import jakarta.persistence.LockModeType;
 import java.util.Optional;
-import java.util.UUID;
 
-interface EventJpaRepository extends JpaRepository<EventJpaEntity, UUID> {
+interface EventJpaRepository extends JpaRepository<EventJpaEntity, Long> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select e from EventJpaEntity e where e.id = :id")
-    Optional<EventJpaEntity> findByIdForUpdate(@Param("id") UUID id);
+    Optional<EventJpaEntity> findByIdForUpdate(@Param("id") Long id);
 }

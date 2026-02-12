@@ -2,9 +2,7 @@ package com.kkarimi.eventmanagement.registration.internal;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.UUID;
+interface RegistrationJpaRepository extends JpaRepository<RegistrationJpaEntity, Long> {
 
-interface RegistrationJpaRepository extends JpaRepository<RegistrationJpaEntity, UUID> {
-
-    boolean existsByEventIdAndAttendeeId(UUID eventId, UUID attendeeId);
+    boolean existsByEventIdAndAttendeeId(Long eventId, Long attendeeId);
 }
