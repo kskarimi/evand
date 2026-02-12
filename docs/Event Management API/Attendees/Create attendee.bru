@@ -1,0 +1,98 @@
+meta {
+  name: Create attendee
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/attendees
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "fullName": "",
+    "email": ""
+  }
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:8080
+}
+
+example {
+  name: 201 Response
+  description: Created
+  
+  request: {
+    url: {{baseUrl}}/api/attendees
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "fullName": "",
+        "email": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 201
+      text: Created
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "id": "",
+          "fullName": "",
+          "email": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 429 Response
+  description: Rate limit exceeded
+  
+  request: {
+    url: {{baseUrl}}/api/attendees
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "fullName": "",
+        "email": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 429
+      text: Too Many Requests
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "error": ""
+        }
+      '''
+    }
+  }
+}

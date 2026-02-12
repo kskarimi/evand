@@ -1,0 +1,91 @@
+meta {
+  name: List registrations
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/registrations
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~page: 
+  ~size: 
+  ~sort: 
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:8080
+}
+
+example {
+  name: 200 Response
+  description: Successful response
+  
+  request: {
+    url: {{baseUrl}}/api/registrations
+    method: GET
+    mode: none
+    params:query: {
+      ~page: 
+      ~size: 
+      ~sort: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 429 Response
+  description: Rate limit exceeded
+  
+  request: {
+    url: {{baseUrl}}/api/registrations
+    method: GET
+    mode: none
+    params:query: {
+      ~page: 
+      ~size: 
+      ~sort: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 429
+      text: Too Many Requests
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "error": ""
+        }
+      '''
+    }
+  }
+}
