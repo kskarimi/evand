@@ -49,8 +49,8 @@ paths:
           in: path
           required: true
           schema:
-            type: string
-            format: uuid
+            type: integer
+            format: int64
       responses:
         '200':
           description: Successful response
@@ -141,7 +141,7 @@ paths:
         '404':
           description: Event or attendee not found
         '409':
-          description: Event has no available seats
+          description: Duplicate registration or event has no available seats
         '429':
           description: Rate limit exceeded
           content:
@@ -236,8 +236,8 @@ components:
       required: [id, title, startsAt, capacity, reservedSeats]
       properties:
         id:
-          type: string
-          format: uuid
+          type: integer
+          format: int64
         title:
           type: string
         startsAt:
@@ -256,8 +256,8 @@ components:
       required: [id, fullName, email]
       properties:
         id:
-          type: string
-          format: uuid
+          type: integer
+          format: int64
         fullName:
           type: string
         email:
@@ -268,14 +268,14 @@ components:
       required: [id, eventId, attendeeId, registeredAt]
       properties:
         id:
-          type: string
-          format: uuid
+          type: integer
+          format: int64
         eventId:
-          type: string
-          format: uuid
+          type: integer
+          format: int64
         attendeeId:
-          type: string
-          format: uuid
+          type: integer
+          format: int64
         registeredAt:
           type: string
           format: date-time
@@ -306,11 +306,11 @@ components:
       required: [eventId, attendeeId]
       properties:
         eventId:
-          type: string
-          format: uuid
+          type: integer
+          format: int64
         attendeeId:
-          type: string
-          format: uuid
+          type: integer
+          format: int64
     ErrorResponse:
       type: object
       properties:

@@ -12,8 +12,8 @@ post {
 
 body:json {
   {
-    "eventId": "1",
-    "attendeeId": "1"
+    "eventId": 1,
+    "attendeeId": 1
   }
 }
 
@@ -31,8 +31,8 @@ example {
     mode: json
     body:json: {
       {
-        "eventId": "",
-        "attendeeId": ""
+        "eventId": 1,
+        "attendeeId": 1
       }
     }
   }
@@ -94,7 +94,7 @@ example {
 
 example {
   name: 409 Response
-  description: Event has no available seats
+  description: Duplicate registration or event has no available seats
   
   request: {
     url: {{baseUrl}}/api/registrations
@@ -102,8 +102,8 @@ example {
     mode: json
     body:json: {
       {
-        "eventId": "",
-        "attendeeId": ""
+        "eventId": 1,
+        "attendeeId": 1
       }
     }
   }

@@ -3,6 +3,11 @@
 ## Current Release
 
 ### Highlights
+- Migrated entity identifiers from UUID to database identity auto-increment (`BIGINT`/`Long`) across API, domain, persistence, and tests.
+- Added duplicate registration protection so one attendee cannot register twice for the same event.
+- Added DB unique constraint on `registrations(event_id, attendee_id)`.
+- Updated OpenAPI/API docs for numeric IDs and registration conflict behavior.
+- Stabilized unit-test execution on Java 25 by using Mockito subclass mock maker (no inline agent requirement).
 - Built a modular event-management backend with Spring Modulith.
 - Added persistent storage with MariaDB and Liquibase-managed schema migrations.
 - Added Redis caching for event read operations.

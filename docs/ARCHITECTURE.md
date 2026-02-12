@@ -51,6 +51,7 @@ This project demonstrates a production-oriented modular monolith design for inte
 
 ## Data and Infrastructure
 - MariaDB: system of record for `events`, `attendees`, `registrations`.
+- Primary key strategy: database identity (`BIGINT` auto-increment) mapped as `Long` in domain/API models.
 - Liquibase: schema migration source of truth.
 - Redis: Spring Cache backend.
 - MongoDB: change history for `eventhistory` module.
@@ -97,6 +98,7 @@ sequenceDiagram
     Web->>Reg: register(command)
     Reg->>Events: findById + reserveSeat
     Reg->>Attendees: findById
+    Reg->>Reg: reject duplicate (eventId, attendeeId)
     Reg->>Notif: sendRegistrationConfirmation
     Reg-->>Web: Registration
     Web-->>Client: 201 Created

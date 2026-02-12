@@ -12,6 +12,8 @@ Base URL: `http://localhost:8080`
 2. Create an attendee
 3. Register attendee in event
 
+IDs are numeric database-generated values (`BIGINT` / `Long`).
+
 ## cURL Examples
 
 ### 1. Create Event
@@ -55,8 +57,8 @@ curl 'http://localhost:8080/api/attendees?page=0&size=20&sort=fullName,asc'
 curl -X POST 'http://localhost:8080/api/registrations' \
   -H 'Content-Type: application/json' \
   -d '{
-    "eventId": "{eventId}",
-    "attendeeId": "{attendeeId}"
+    "eventId": 1,
+    "attendeeId": 1
   }'
 ```
 
@@ -76,3 +78,8 @@ All list endpoints return paged response:
 - `last`
 - `numberOfElements`
 - `empty`
+
+## Conflict Cases
+- `409 CONFLICT` with `error=DUPLICATE_ATTENDEE` when attendee email already exists.
+- `409 CONFLICT` with `error=DUPLICATE_REGISTRATION` when the same attendee is registered twice for the same event.
+- `409 CONFLICT` with `error=CONFLICT` when event has no remaining seats.

@@ -58,6 +58,7 @@ Services:
 
 ## Database Auditing
 - JPA auditing is enabled for core tables: `events`, `attendees`, `registrations`
+- Entity IDs use database identity auto-increment (`BIGINT`) and are represented as `Long` in API payloads.
 - Audit columns:
   - `created_at`
   - `updated_at`
@@ -125,3 +126,4 @@ mvn -DskipTests deploy
   - data change tracking aspect (`eventhistory`)
   - customer API rate-limit filter
   - trace context initialization filter (trace/span propagation)
+- Registration rule: same attendee cannot register twice in the same event (`DUPLICATE_REGISTRATION`, HTTP `409`).
