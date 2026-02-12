@@ -1,6 +1,7 @@
 package com.kkarimi.eventmanagement.web;
 
 import com.kkarimi.eventmanagement.attendees.DuplicateAttendeeException;
+import com.kkarimi.eventmanagement.registration.DuplicateRegistrationException;
 import jakarta.validation.ConstraintViolationException;
 import java.util.NoSuchElementException;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,12 @@ class GlobalExceptionHandler {
     ResponseEntity<ApiErrorResponse> handleDuplicateAttendee(DuplicateAttendeeException exception) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(new ApiErrorResponse("DUPLICATE_ATTENDEE", exception.getMessage()));
+    }
+
+    @ExceptionHandler(DuplicateRegistrationException.class)
+    ResponseEntity<ApiErrorResponse> handleDuplicateRegistration(DuplicateRegistrationException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ApiErrorResponse("DUPLICATE_REGISTRATION", exception.getMessage()));
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)

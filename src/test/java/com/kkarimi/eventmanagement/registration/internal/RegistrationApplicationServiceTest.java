@@ -5,6 +5,7 @@ import com.kkarimi.eventmanagement.attendees.AttendeeDirectory;
 import com.kkarimi.eventmanagement.events.Event;
 import com.kkarimi.eventmanagement.events.EventCatalog;
 import com.kkarimi.eventmanagement.notifications.NotificationGateway;
+import com.kkarimi.eventmanagement.registration.DuplicateRegistrationException;
 import com.kkarimi.eventmanagement.registration.Registration;
 import com.kkarimi.eventmanagement.registration.RegistrationCommand;
 import org.junit.jupiter.api.Test;
@@ -102,6 +103,22 @@ class RegistrationApplicationServiceTest {
 
         assertThrows(NoSuchElementException.class, () -> service.register(new RegistrationCommand(eventId, attendeeId)));
 
+        verify(repository, never()).save(any());
+        verify(notificationGateway, never()).sendRegistrationConfirmation(any());
+    }
+
+    @Test
+    void registerShouldFailWhenAttendeeAlreadyRegisteredForEvent() {
+        UUID eventId = UUID.randomUUID();
+        UUID attendeeId = UUID.randomUUID();
+
+        when(eventCatalog.findById(eventId)).thenReturn(Optional.of(new Event(eventId, "E", LocalDateTime.now().plusDays(1), 10, 0)));
+        when(attendeeDirectory.findById(attendeeId)).thenReturn(Optional.of(new Attendee(attendeeId, "Karim", "k@example.com")));
+        when(repository.existsByEventIdAndAttendeeId(eventId, attendeeId)).thenReturn(true);
+
+        assertThrows(DuplicateRegistrationException.class, () -> service.register(new RegistrationCommand(eventId, attendeeId)));
+
+        verify(eventCatalog, never()).reserveSeat(any());
         verify(repository, never()).save(any());
         verify(notificationGateway, never()).sendRegistrationConfirmation(any());
     }

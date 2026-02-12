@@ -5,6 +5,7 @@ import com.kkarimi.eventmanagement.eventhistory.TrackEventHistory;
 import com.kkarimi.eventmanagement.events.EventCatalog;
 import com.kkarimi.eventmanagement.metrics.MeasuredOperation;
 import com.kkarimi.eventmanagement.notifications.NotificationGateway;
+import com.kkarimi.eventmanagement.registration.DuplicateRegistrationException;
 import com.kkarimi.eventmanagement.registration.Registration;
 import com.kkarimi.eventmanagement.registration.RegistrationApplication;
 import com.kkarimi.eventmanagement.registration.RegistrationCommand;
@@ -42,6 +43,10 @@ class RegistrationApplicationService implements RegistrationApplication {
 
         attendeeDirectory.findById(command.attendeeId())
                 .orElseThrow(() -> new NoSuchElementException("Attendee not found: " + command.attendeeId()));
+
+        if (repository.existsByEventIdAndAttendeeId(command.eventId(), command.attendeeId())) {
+            throw new DuplicateRegistrationException(command.eventId(), command.attendeeId());
+        }
 
         eventCatalog.reserveSeat(command.eventId());
 
