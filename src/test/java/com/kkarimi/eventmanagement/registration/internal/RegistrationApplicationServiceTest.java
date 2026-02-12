@@ -13,6 +13,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -108,13 +112,15 @@ class RegistrationApplicationServiceTest {
         RegistrationJpaEntity e2 = new RegistrationJpaEntity(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), Instant.now());
         Registration m1 = new Registration(e1.getId(), e1.getEventId(), e1.getAttendeeId(), e1.getRegisteredAt());
         Registration m2 = new Registration(e2.getId(), e2.getEventId(), e2.getAttendeeId(), e2.getRegisteredAt());
+        Pageable pageable = PageRequest.of(0, 20);
+        Page<RegistrationJpaEntity> entityPage = new PageImpl<>(List.of(e1, e2), pageable, 2);
 
-        when(repository.findAll()).thenReturn(List.of(e1, e2));
+        when(repository.findAll(pageable)).thenReturn(entityPage);
         when(mapper.toModel(e1)).thenReturn(m1);
         when(mapper.toModel(e2)).thenReturn(m2);
 
-        List<Registration> result = service.findAll();
+        Page<Registration> result = service.findAll(pageable);
 
-        assertEquals(List.of(m1, m2), result);
+        assertEquals(List.of(m1, m2), result.getContent());
     }
 }

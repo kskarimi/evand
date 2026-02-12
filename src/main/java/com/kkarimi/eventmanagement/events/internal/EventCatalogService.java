@@ -8,11 +8,11 @@ import com.kkarimi.eventmanagement.metrics.MeasuredOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
@@ -65,12 +65,9 @@ class EventCatalogService implements EventCatalog {
     }
 
     @Override
-    @Cacheable(cacheNames = "eventList")
+    @Cacheable(cacheNames = "eventList", key = "#pageable")
     @MeasuredOperation(timer = "event.lookup.duration")
-    public List<Event> findAll() {
-        return repository.findAll().stream()
-                .map(mapper::toModel)
-                .sorted(Comparator.comparing(Event::startsAt))
-                .toList();
+    public Page<Event> findAll(Pageable pageable) {
+        return repository.findAll(pageable).map(mapper::toModel);
     }
 }

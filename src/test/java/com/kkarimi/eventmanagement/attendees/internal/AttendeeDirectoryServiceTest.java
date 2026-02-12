@@ -7,6 +7,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -64,13 +68,15 @@ class AttendeeDirectoryServiceTest {
         AttendeeJpaEntity e2 = new AttendeeJpaEntity(UUID.randomUUID(), "B", "b@example.com");
         Attendee m1 = new Attendee(e1.getId(), "A", "a@example.com");
         Attendee m2 = new Attendee(e2.getId(), "B", "b@example.com");
+        Pageable pageable = PageRequest.of(0, 20);
+        Page<AttendeeJpaEntity> entityPage = new PageImpl<>(List.of(e1, e2), pageable, 2);
 
-        when(repository.findAll()).thenReturn(List.of(e1, e2));
+        when(repository.findAll(pageable)).thenReturn(entityPage);
         when(mapper.toModel(e1)).thenReturn(m1);
         when(mapper.toModel(e2)).thenReturn(m2);
 
-        List<Attendee> result = service.findAll();
+        Page<Attendee> result = service.findAll(pageable);
 
-        assertEquals(List.of(m1, m2), result);
+        assertEquals(List.of(m1, m2), result.getContent());
     }
 }

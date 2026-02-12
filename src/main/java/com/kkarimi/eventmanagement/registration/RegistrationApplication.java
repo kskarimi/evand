@@ -1,10 +1,11 @@
 package com.kkarimi.eventmanagement.registration;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface RegistrationApplication {
 
     Registration register(RegistrationCommand command);
 
-    List<Registration> findAll();
+    Page<Registration> findAll(Pageable pageable);
 }

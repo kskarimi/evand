@@ -27,7 +27,7 @@ curl -X POST 'http://localhost:8080/api/events' \
 
 ### 2. List Events
 ```bash
-curl 'http://localhost:8080/api/events'
+curl 'http://localhost:8080/api/events?page=0&size=20&sort=startsAt,asc'
 ```
 
 ### 3. Get Event by ID
@@ -47,7 +47,7 @@ curl -X POST 'http://localhost:8080/api/attendees' \
 
 ### 5. List Attendees
 ```bash
-curl 'http://localhost:8080/api/attendees'
+curl 'http://localhost:8080/api/attendees?page=0&size=20&sort=fullName,asc'
 ```
 
 ### 6. Register Attendee in Event
@@ -62,5 +62,17 @@ curl -X POST 'http://localhost:8080/api/registrations' \
 
 ### 7. List Registrations
 ```bash
-curl 'http://localhost:8080/api/registrations'
+curl 'http://localhost:8080/api/registrations?page=0&size=20&sort=registeredAt,desc'
 ```
+
+## Pagination
+All list endpoints return paged response:
+- `content`
+- `page`
+- `size`
+- `totalElements`
+- `totalPages`
+- `first`
+- `last`
+- `numberOfElements`
+- `empty`

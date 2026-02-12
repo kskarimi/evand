@@ -1,8 +1,9 @@
 package com.kkarimi.eventmanagement.events;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface EventCatalog {
 
@@ -12,5 +13,5 @@ public interface EventCatalog {
 
     Event reserveSeat(UUID eventId);
 
-    List<Event> findAll();
+    Page<Event> findAll(Pageable pageable);
 }

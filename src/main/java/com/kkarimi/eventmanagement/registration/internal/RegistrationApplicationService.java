@@ -9,11 +9,12 @@ import com.kkarimi.eventmanagement.registration.Registration;
 import com.kkarimi.eventmanagement.registration.RegistrationApplication;
 import com.kkarimi.eventmanagement.registration.RegistrationCommand;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -56,9 +57,7 @@ class RegistrationApplicationService implements RegistrationApplication {
     }
 
     @Override
-    public List<Registration> findAll() {
-        return repository.findAll().stream()
-                .map(mapper::toModel)
-                .toList();
+    public Page<Registration> findAll(Pageable pageable) {
+        return repository.findAll(pageable).map(mapper::toModel);
     }
 }

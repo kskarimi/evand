@@ -7,6 +7,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -92,20 +96,22 @@ class EventCatalogServiceTest {
     }
 
     @Test
-    void findAllShouldReturnSortedByStartDate() {
+    void findAllShouldReturnPagedMappedEvents() {
         LocalDateTime late = LocalDateTime.now().plusDays(2);
         LocalDateTime early = LocalDateTime.now().plusDays(1);
         EventJpaEntity e1 = new EventJpaEntity(UUID.randomUUID(), "Late", late, 10, 0, null);
         EventJpaEntity e2 = new EventJpaEntity(UUID.randomUUID(), "Early", early, 10, 0, null);
         Event m1 = new Event(e1.getId(), "Late", late, 10, 0);
         Event m2 = new Event(e2.getId(), "Early", early, 10, 0);
+        Pageable pageable = PageRequest.of(0, 20);
+        Page<EventJpaEntity> entityPage = new PageImpl<>(List.of(e1, e2), pageable, 2);
 
-        when(repository.findAll()).thenReturn(List.of(e1, e2));
+        when(repository.findAll(pageable)).thenReturn(entityPage);
         when(mapper.toModel(e1)).thenReturn(m1);
         when(mapper.toModel(e2)).thenReturn(m2);
 
-        List<Event> result = service.findAll();
+        Page<Event> result = service.findAll(pageable);
 
-        assertEquals(List.of(m2, m1), result);
+        assertEquals(List.of(m1, m2), result.getContent());
     }
 }

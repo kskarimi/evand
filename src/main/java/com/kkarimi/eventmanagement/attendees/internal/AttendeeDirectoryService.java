@@ -5,10 +5,11 @@ import com.kkarimi.eventmanagement.attendees.Attendee;
 import com.kkarimi.eventmanagement.attendees.AttendeeDirectory;
 import com.kkarimi.eventmanagement.attendees.NewAttendeeCommand;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,7 +35,7 @@ class AttendeeDirectoryService implements AttendeeDirectory {
     }
 
     @Override
-    public List<Attendee> findAll() {
-        return repository.findAll().stream().map(mapper::toModel).toList();
+    public Page<Attendee> findAll(Pageable pageable) {
+        return repository.findAll(pageable).map(mapper::toModel);
     }
 }

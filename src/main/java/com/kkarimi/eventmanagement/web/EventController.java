@@ -7,6 +7,8 @@ import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -44,8 +45,8 @@ class EventController {
     }
 
     @GetMapping
-    List<Event> list() {
-        return eventCatalog.findAll();
+    PageResponse<Event> list(@PageableDefault(size = 20, sort = "startsAt") Pageable pageable) {
+        return PageResponse.from(eventCatalog.findAll(pageable));
     }
 
     record CreateEventRequest(
